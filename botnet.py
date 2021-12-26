@@ -120,17 +120,23 @@ debug_jid = "8675309debug_y8f@talk.kik.com" #This is where activity info is sent
 print(bcolors.OKGREEN + "\nLet's get started!" + bcolors.ENDC)
 
 setup_preset = False
+use_creds = False
+credentials = {}
 def get_preset():
-    global setup_preset
-    ask_preset = input(bcolors.OKGREEN + ("Would you like to setup automatic startup?\n[1] Yes, I would like to set it up.\n[2] No, I would like to startup manually.\n> ") + bcolors.ENDC)
+    global setup_preset, use_creds
+    ask_preset = input(bcolors.OKGREEN + ("Would you like to setup automatic startup?\n[1] Yes, I would like to set it up.\n[2] No, I would like to startup manually.\n[3] I would like to use credentials.txt\n> ") + bcolors.ENDC)
     if str(ask_preset) == "1":
         print(bcolors.OKGREEN + ("Great! I'll setup automatic startup for you.\nJust input your details like normal and I'll do the rest!") + bcolors.ENDC)
         setup_preset = True
     elif str(ask_preset) == "2":
         ominous_dots(bcolors.OKGREEN + ("Okay, continuing without automatic startup") + bcolors.ENDC)
+    elif str(ask_preset) == "3":
+        use_creds = True
+        ominous_dots(bcolors.OKGREEN + ("Okay, using credentials.txt") + bcolors.ENDC)
     else:
         print(bcolors.FAIL + "Invalid input! Please only use the number \"1\" or \"2\" (without quotations)\nExiting..." + bcolors.ENDC)
         exit()
+
 
 if use_preset == False:
     get_preset()
