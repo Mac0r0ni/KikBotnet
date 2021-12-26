@@ -1,12 +1,6 @@
 V5.3 was released on 11/28/2021!
 For more information, check [Updates.md](https://github.com/StethoSaysHello/KikBotnet/blob/main/Updates.md)
 
-# Goodbye Note
-
-I will no longer be maintaining this project for the most part!
-
-If anyone who knows python and is familiar with [Tomer8007's Kik Bot API](https://github.com/tomer8007/kik-bot-api-unofficial) would like to take over this project, shoot me an email at StethoSpasm@Gmail.com.
-In the meantime, I'm not dead! I'm working on other projects, some of which are related to this botnet, like a [KivyMD](https://kivymd.readthedocs.io/en/latest/) Android app for it and a Node.js version with [YassienW's version of the API](https://github.com/YassienW/kik-node-api) that's now in beta testing!
 
 # About
 This is a Kik botnet that uses [Tomer8007's Kik Bot API](https://github.com/tomer8007/kik-bot-api-unofficial) to spam users and groups.
