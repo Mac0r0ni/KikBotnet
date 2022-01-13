@@ -137,7 +137,6 @@ def get_preset():
         print(bcolors.FAIL + "Invalid input! Please only use the number \"1\" or \"2\" (without quotations)\nExiting..." + bcolors.ENDC)
         exit()
 
-
 if use_preset == False:
     get_preset()
 
@@ -174,6 +173,13 @@ def get_prefix(): #This function asks for the bot prefix.
 
 if use_preset == True:
     username_thing = preset_username
+elif use_creds == True:
+    with open("credentials.txt", "r") as a_file:
+        for line in a_file:
+            stripped_line = line.strip()
+            cred = stripped_line.split(":")
+            credentials[cred[0]] = cred[1]
+    a_file.close()
 else:
     username_thing = get_prefix() #This triggers the function that aske for the bot prefix
     if len(username_thing) == 0: #This checks for blank prefixes, and retries get_prefix if there are any.
@@ -194,6 +200,8 @@ def get_bot_quantity(): #This function asks the user how many bots they wanna us
 
 if use_preset == True:
     thing = preset_num_of_bots
+elif use_creds == True:
+    thing = len(credentials)
 else:
     thing = get_bot_quantity() #This triggers the above function to ask the user how many bots they wanna use,
     if thing == "NULL": #This retries get_bot_quantity when the input is not a number.
@@ -206,6 +214,9 @@ else:
 if use_preset == True:
     given_pass = preset_password
     bootup_message = "I am logging in with the preset options: \nUsername prefix - " + str(preset_username) + "\nPassword - " + str(preset_password) + "\nNumber of bots - " + str(preset_num_of_bots)
+    print(bcolors.OKGREEN + bootup_message + bcolors.ENDC)
+elif use_creds == True:
+    bootup_message = "I am logging in with the credentials.txt"
     print(bcolors.OKGREEN + bootup_message + bcolors.ENDC)
 else:
     given_pass = input(bcolors.OKGREEN + ("\n" + str(thing) + " bots, got it! What is the password for your bots?: ") + bcolors.ENDC) #This asks for the bot's password, it doesn't need error handling.
@@ -223,6 +234,7 @@ time.sleep(1)
 print(bcolors.FAIL + emoji.emojize(":warning: RED messages are important and require your attention, keep an eye out for them!") + bcolors.ENDC) #This is an example red text, ooooo
 time.sleep(3)
 print(bcolors.OKGREEN + emoji.emojize("I am now attempting to login to the botnet.") + bcolors.ENDC)
+
 def login(give_a_username, give_a_password, thing): #This is a function for logging in, it asks for user/pass and # of bots. Its a function so that it can be called on to retry later if there are any closed connections.
     stetho_string = give_a_username #These arent really relevant but I didnt feel like changing variable names when I added retry on connection error, sooo....
     given_pass = give_a_password
@@ -546,16 +558,25 @@ def login(give_a_username, give_a_password, thing): #This is a function for logg
             result = False #This lets the login stanzas know that the login failed and it can continue with the next one.
             print(bcolors.OKGREEN + emoji.emojize(" Kik closed the connection!") + bcolors.ENDC) #This lets the user know the connection was closed
             oof = open("loginerror.txt", "a+") #This opens the loginerror.txt file
-            oof.write(username_thing + str(thing) + "\n") #This writes the username of the bot into the loginerror.txt file for the login retry later
+            if use_creds:
+                oof.write(username + "\n")
+            else:
+                oof.write(username_thing + str(thing) + "\n") #This writes the username of the bot into the loginerror.txt file for the login retry later
             oof.close() #This closes the text file. Always a good practice
 
         def on_login_error(self, login_error: LoginError): #This function is triggered when there is a login error.
             global result
             result = False #This lets the login stanzas know that the login failed and it can continue with the next one.
             if login_error.is_captcha(): #This is triggered when the error is a captcha. Would have added the captcha wizard, but thats not very useful in a botnet.
-                print(bcolors.FAIL + emoji.emojize(":warning: Oh no! There is a captcha on @" + username_thing + str(thing) + ", I can't login! Please sign into it manually on your own device to clear the captcha.") + bcolors.ENDC) #This warns the user of the captcha.
+                if use_creds:
+                    print(bcolors.FAIL + emoji.emojize(":warning: Oh no! There is a captcha on @" + username + ", I can't login! Please sign into it manually on your own device to clear the captcha.") + bcolors.ENDC)
+                else:
+                    print(bcolors.FAIL + emoji.emojize(":warning: Oh no! There is a captcha on @" + username_thing + str(thing) + ", I can't login! Please sign into it manually on your own device to clear the captcha.") + bcolors.ENDC) #This warns the user of the captcha.
             else: #Any other issues are username/password mismatches, so this is triggered when the error is not a captcha.
-                print(bcolors.FAIL + emoji.emojize(":warning: Oh no! Your username or password for @" + username_thing + str(thing) + " is incorrect!") + bcolors.ENDC) #This warns the user the username/password is incorrect.
+                if use_creds:
+                    print(bcolors.FAIL + emoji.emojize(":warning: Oh no! Your username or password for @" + username + " is incorrect!") + bcolors.ENDC)
+                else:
+                    print(bcolors.FAIL + emoji.emojize(":warning: Oh no! Your username or password for @" + username_thing + str(thing) + " is incorrect!") + bcolors.ENDC) #This warns the user the username/password is incorrect.
 
     if __name__ == '__main__': #This is used to execute the login process only if the file was run directly, and not imported.
         main()
@@ -564,12 +585,20 @@ clear = open("loginerror.txt", "w+") #This clears out loginerror.txt
 clear.close()
 if attempt_number == 0: #This checks if logins have been attempted yet, and starts the first login attempts if not.
     while int(thing) > 0: #This loops through the number of bots
-        for i in range(thing):
-            stetho_string = username_thing + str(thing) #This gets the username to login as
-            login(stetho_string, given_pass, thing) #This attempts the login
-            while result is None:
-                pass
-            thing = int(thing) - 1 #This decreases the bot count by one after the login attempt
+        if use_creds:
+            for username in credentials.keys():
+                password = credentials[username]
+                login(username, password, '')
+                while result is None:
+                    pass
+                thing = int(thing) - 1 #This decreases the bot count by one after the login attempt
+        else:
+            for i in range(thing):
+                stetho_string = username_thing + str(thing) #This gets the username to login as
+                login(stetho_string, given_pass, thing) #This attempts the login
+                while result is None:
+                    pass
+                thing = int(thing) - 1 #This decreases the bot count by one after the login attempt
     attempt_number = attempt_number + 1 #This increases the attempt number so that this chunk is not triggered again
 
 
@@ -606,7 +635,10 @@ def retry_login(password): #This function retries logns when there are closed co
                 else:
                     checked_name = name
                 if not not checked_name: #This ignores blank lines
-                    login(checked_name, password, number_of_errors) #This attempts to login
+                    if use_creds:
+                        login(checked_name, credentials[checked_name], '')
+                    else:
+                        login(checked_name, password, number_of_errors) #This attempts to login
                 time.sleep(5) #This waits 5 seconds between each login to avoid closed connections
                 number_of_errors = number_of_errors - 1 #This subtracts 1 from the error count
         retry.close() #This closes the file, always a good practice.
