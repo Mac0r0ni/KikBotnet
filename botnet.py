@@ -93,12 +93,7 @@ except ModuleNotFoundError: #This is triggered if the import fails
     print(bcolors.OKGREEN + ("\nOne moment while I install the colorama module.") + bcolors.ENDC) #This lets the user know it will install the module
     install('colorama')  # This is used to make pretty colors in the terminal. oooooo
     import colorama
-try: #This tries to import
-    import kik_unofficial
-except ModuleNotFoundError: #This is triggered if the import fails
-    print(bcolors.OKGREEN + ("\nOne moment while I install the kik_unofficial module.") + bcolors.ENDC) #This lets the user know it will install the module
-    install('kik_unofficial')  # This is pretty obvious
-    import kik_unofficial
+
 
 import kik_unofficial.datatypes.xmpp.chatting as chatting
 from kik_unofficial.client import KikClient
@@ -171,15 +166,7 @@ def get_prefix(): #This function asks for the bot prefix.
     username_thing = input(bcolors.OKGREEN + ("\n\nWhat is the prefix of your bots usernames?: ") + bcolors.ENDC) #This asks for the bot username prefix in the terminal.
     return username_thing
 
-if use_preset == True:
-    username_thing = preset_username
-elif use_creds == True:
-    with open("credentials.txt", "r") as a_file:
-        for line in a_file:
-            stripped_line = line.strip()
-            cred = stripped_line.split(":")
-            credentials[cred[0]] = cred[1]
-    a_file.close()
+
 else:
     username_thing = get_prefix() #This triggers the function that aske for the bot prefix
     if len(username_thing) == 0: #This checks for blank prefixes, and retries get_prefix if there are any.
